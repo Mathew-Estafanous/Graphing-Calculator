@@ -8,6 +8,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class GraphingPanel extends JPanel{
     /**
      *
@@ -22,8 +26,13 @@ public class GraphingPanel extends JPanel{
     private double xAxis;
     private double yAxis;
 
+    private HashMap<Integer, double[][]> graph_coordinate = new HashMap<Integer, double[][]>();
+    private HashMap<Integer, String> graph_equations = new HashMap<Integer, String>();
+    private List<Integer> graph_locations = new ArrayList<Integer>();
+
     private double[][] coordinates;
     private static Color axisColour = Color.BLACK;
+    private static Color[] graphColours = {Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE, Color.MAGENTA, Color.yellow};
 
     public GraphingPanel(int width, int height) {
         this.graphHeight = height;
@@ -79,23 +88,26 @@ public class GraphingPanel extends JPanel{
             }
         }
 
-        if(coordinates != null){
+        if(!graph_coordinate.isEmpty()){
             createFunction(g2);
         }
     }
 
     public void createFunction(Graphics2D g2) {
-        for(int i = 0; i < coordinates.length - 1; i++) {
-            double xCord_1 = i;
-            double xCord_2 = i + 1;
-            double yCord_1 = coordinates[i][1];
-            double yCord_2 = coordinates[i + 1][1];
-            double graphYCord_1 = (yCord_1 - yAxis) * -this.ySpacing;
-            double graphYCord_2 = (yCord_2 - yAxis) * -this.ySpacing;
-            Shape line = new Line2D.Double(xCord_1, graphYCord_1, xCord_2, graphYCord_2);
+        for(int j = 0; j < graph_locations.size(); j++) {
+            coordinates = graph_coordinate.get(graph_locations.get(j));
+            for(int i = 0; i < coordinates.length - 1; i++) {
+                double xCord_1 = i;
+                double xCord_2 = i + 1;
+                double yCord_1 = coordinates[i][1];
+                double yCord_2 = coordinates[i + 1][1];
+                double graphYCord_1 = (yCord_1 - yAxis) * -this.ySpacing;
+                double graphYCord_2 = (yCord_2 - yAxis) * -this.ySpacing;
+                Shape line = new Line2D.Double(xCord_1, graphYCord_1, xCord_2, graphYCord_2);
 
-            g2.setColor(Color.RED);
-            g2.draw(line);
+                g2.setColor(graphColours[j]);
+                g2.draw(line);
+            }
         }
     }
 
@@ -108,7 +120,29 @@ public class GraphingPanel extends JPanel{
         return xAxis;
     }
 
-    public void setCoordinates(double[][] coordinates) {
-        this.coordinates = coordinates;
+    public List getGraphList() {
+        return graph_locations;
+    }
+
+    public HashMap getGraphEquations() {
+        return graph_equations;
+    }
+
+    public void setCoordinates(int key, double[][] coordinates, String equation) {
+        if(graph_coordinate.containsKey(key)) {
+            graph_coordinate.replace(key, coordinates);
+            graph_equations.replace(key, equation);
+            return;
+        }
+
+        graph_coordinate.put(key, coordinates);
+        graph_equations.put(key, equation);
+        graph_locations.add(key);
+    }
+
+    public void removeCoordinates(int key) {
+        graph_coordinate.remove(key);
+        graph_locations.remove(key);
+        graph_equations.remove(key);
     }
 }

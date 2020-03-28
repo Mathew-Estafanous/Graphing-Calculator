@@ -4,9 +4,12 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JComboBox;
 
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 public class InteractPanel extends JPanel {
@@ -20,9 +23,13 @@ public class InteractPanel extends JPanel {
     private JTextField rangetxt;
     private JButton rangebtn;
 
+    private JLabel choiceLbl;
+    private JComboBox<String> dropBox;
+    private String[] numOption = {"1", "2", "3", "4", "5", "6"};
+
     private JTextField txtField;
     private JButton btn;
-    private JLabel label;
+    private JLabel btnLable;
 
     private String equation = "";
 
@@ -38,7 +45,7 @@ public class InteractPanel extends JPanel {
                 try {
                     GraphingPanel graphPan = MainFrame.getGraphingPanel();
                     graphPan.createGraphAxis(Integer.parseInt(rangeArray[0]), Integer.parseInt(rangeArray[1]));
-                    processGraph();
+                    processAllGraphs();
                     graphPan.repaint();
                 } catch (Exception e) {
                     System.out.println(e);
@@ -47,8 +54,11 @@ public class InteractPanel extends JPanel {
             }
         });
 
+        this.choiceLbl = new JLabel("Select #");
+        this.dropBox = new JComboBox<String>(numOption);
+        this.dropBox.setSelectedIndex(0);
 
-        this.label = new JLabel("Function f(x) =");
+        this.btnLable = new JLabel("Function f(x) =");
         this.txtField = new JTextField(20);
         this.btn = new JButton("Graph");
         this.btn.setPreferredSize(new Dimension(100, 30));
@@ -56,27 +66,53 @@ public class InteractPanel extends JPanel {
         this.btn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 equation = txtField.getText();
-                processGraph();
+                processThisGraph();
             }
         });
 
         add(this.rangeLbl);
         add(this.rangetxt);
         add(this.rangebtn);
-        add(this.label);
+
+        add(this.choiceLbl);
+        add(this.dropBox);
+
+        add(this.btnLable);
         add(this.txtField);
         add(this.btn);
     }
 
-    public void processGraph() {
+    private void processAllGraphs() {
+        GraphingPanel graphPan = MainFrame.getGraphingPanel();
+        List<Integer> graphKeys = graphPan.getGraphList();
+        HashMap<Integer, String> graphEquations = graphPan.getGraphEquations();
+        int key = 0;
+        for(int i = 0; i < graphKeys.size(); i++) {
+            key = graphKeys.get(i);
+            equation = graphEquations.get(key);
+            processCoordinates(graphPan, key);
+        }
+    }
+
+    private void processThisGraph() {
+        GraphingPanel graphPan = MainFrame.getGraphingPanel();
+        int key = this.dropBox.getSelectedIndex();
+        if(equation.toLowerCase().equals("clear")) {
+            graphPan.removeCoordinates(key);
+            graphPan.repaint();
+            return;
+        }
+
+        processCoordinates(graphPan, key);
+    }
+
+    private void processCoordinates(GraphingPanel graphPan, int key) {
         double[][] coordinates = FunctionProcessor.processFunction(equation);
         if(coordinates == null) {
             txtField.setText("Invalid Equation");
             return;
         }
-
-        GraphingPanel graphPan = MainFrame.getGraphingPanel();
-        graphPan.setCoordinates(coordinates);
+        graphPan.setCoordinates(key, coordinates, equation);
         graphPan.repaint();
     }
 }
