@@ -12,8 +12,8 @@ public class MainFrame extends JFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private int boardWidth = 850;
-    private int boardHeight = 850;
+    private int boardWidth = 800;
+    private int boardHeight = 800;
     private int panelOffset = 50;
 
     private static InteractPanel interactPanel;
