@@ -95,7 +95,8 @@ public class GraphingPanel extends JPanel{
 
     public void createFunction(Graphics2D g2) {
         for(int j = 0; j < graph_locations.size(); j++) {
-            coordinates = graph_coordinate.get(graph_locations.get(j));
+            int graphKey = graph_locations.get(j);
+            coordinates = graph_coordinate.get(graphKey);
             for(int i = 0; i < coordinates.length - 1; i++) {
                 double xCord_1 = i;
                 double xCord_2 = i + 1;
@@ -105,7 +106,7 @@ public class GraphingPanel extends JPanel{
                 double graphYCord_2 = (yCord_2 - yAxis) * -this.ySpacing;
                 Shape line = new Line2D.Double(xCord_1, graphYCord_1, xCord_2, graphYCord_2);
 
-                g2.setColor(graphColours[j]);
+                g2.setColor(graphColours[graphKey]);
                 g2.draw(line);
             }
         }
@@ -141,8 +142,11 @@ public class GraphingPanel extends JPanel{
     }
 
     public void removeCoordinates(int key) {
+        int index = graph_locations.indexOf(key);
+        if(index == -1) { return; }
+        
         graph_coordinate.remove(key);
-        graph_locations.remove(key);
+        graph_locations.remove(index);
         graph_equations.remove(key);
     }
 }

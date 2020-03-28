@@ -62,14 +62,27 @@ public class InteractPanel extends JPanel {
         this.txtField = new JTextField(20);
         this.btn = new JButton("Graph");
         this.btn.setPreferredSize(new Dimension(100, 30));
+        this.dropBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+                GraphingPanel graphPan = MainFrame.getGraphingPanel();
+                HashMap<Integer, String> graphEquations = graphPan.getGraphEquations();
+                int key = dropBox.getSelectedIndex();
+				txtField.setText(graphEquations.get(key));
+			}
+        });
+
 
         this.btn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                equation = txtField.getText();
-                processThisGraph();
+                try {
+                    equation = txtField.getText();
+                    processThisGraph();
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
             }
         });
-
         add(this.rangeLbl);
         add(this.rangetxt);
         add(this.rangebtn);
